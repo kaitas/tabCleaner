@@ -88,3 +88,13 @@ export async function processTabClose(normalCount, blankCount = 0) {
         isFever: isFeverTime()
     };
 }
+/**
+ * Manually adds bonus karma (e.g., for "Close All" bonus).
+ * @param {number} amount Amount of Karma to add
+ */
+export async function addBonus(amount) {
+    const state = await loadGameState();
+    state.karma += amount;
+    await saveGameState(state);
+    return state.karma;
+}

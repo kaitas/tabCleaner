@@ -373,6 +373,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log('Review mode started for', message.tabs.length, 'tabs');
   }
 
+  if (message.action === 'grantBonus') {
+    import('./gamification.js').then(module => {
+      module.addBonus(message.amount).then(newKarma => {
+        console.log('Bonus granted:', message.amount, 'Total:', newKarma);
+      });
+    });
+  }
+
   return true;
 });
 

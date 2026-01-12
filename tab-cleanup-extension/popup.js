@@ -364,6 +364,14 @@ closeAllBtn.addEventListener('click', async () => {
     }
   }
 
+  // Bonus for "Close All" (x2 Multiplier effect)
+  // The individual standard score is handled by background.js onRemoved listener.
+  // Here we add the "Bonus" portion (another 10pts per tab).
+  const bonusAmount = closingCount * 10;
+  chrome.runtime.sendMessage({ action: 'grantBonus', amount: bonusAmount });
+
+  showToast(`🧹 ${closingCount}タブ消滅！(x2 Bonus)`);
+
   // Update UI after delay
   setTimeout(() => {
     updateTabCount();
