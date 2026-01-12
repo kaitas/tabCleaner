@@ -1,134 +1,37 @@
 # AGENTS.md - AI/エージェント向け開発ガイド
 
-このドキュメントは、AIコーディングアシスタントやエージェントがこのプロジェクトを理解し、効果的に貢献するためのガイドです。
+このドキュメントは、Gemini CLIや他のAIエージェントが「Tab Cleanup」プロジェクトに参加するための「仕草（Behavior）」と「文脈」を定義します。
 
-## 🎯 プロジェクト概要
+## 🎯 プロジェクトの哲学 (AIDX Style)
 
-**Tab Cleanup** は、Chromeブラウザのタブ管理を支援する拡張機能です。
+- **「つくる人をつくる」**: 技術は人間の創造性を高めるための手段である。
+- **積極的な提案**: ユーザーの指示待ちではなく、コードの品質向上やUX改善のための提案を積極的に行う。
+- **ドキュメント駆動**: コードを書く前に、`.gemini/GEMINI.md` や `README.md` を更新し、設計思想を共有する。
 
-### コア機能
-1. タブ一覧の取得とエクスポート
-2. 時刻トリガーによる通知と自動クローズ
-3. 履歴の保存と管理
-4. （予定）Spreadsheet連携
+## 🛠 技術スタックと構造
 
-### 技術スタック
-- Chrome Extension Manifest V3
-- Vanilla JavaScript（フレームワークなし）
-- Chrome Storage API（sync/local）
-- Chrome Alarms API
-- Chrome Notifications API
+- **Extension**: Chrome Extension Manifest V3 (Vanilla JS)
+- **Backend**: Google Apps Script (GAS) + Spreadsheet
+- **AI**: Gemini CLI (主に本READMEや、Issue管理、コードレビューを担う)
 
-## 📐 アーキテクチャ
+### 主要ファイル構成
+- `/tab-cleanup-extension/`: 拡張機能ソース
+- `/.gemini/`: 長期記憶と開発ログ
+- `/gas/`: スプレッドシート連携用スクリプト
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                      Chrome Browser                      │
-├─────────────────────────────────────────────────────────┤
-│  popup.html/js     │  options.html/js  │  background.js │
-│  (ユーザー操作)     │  (設定管理)        │  (常駐処理)    │
-├─────────────────────────────────────────────────────────┤
-│                    Chrome APIs                           │
-│  - tabs.*          - storage.sync/local  - alarms.*     │
-│  - notifications.* - runtime.*                          │
-└─────────────────────────────────────────────────────────┘
-```
+## 🤝 エージェントへの指示
 
-## 🔧 開発ルール
+1. **長期記憶の活用**: `.gemini/GEMINI.md` を最優先で読み込み、プロジェクトの現在のフェーズを理解すること。
+2. **安全性の確保**: タブを「閉じる」という破壊的な操作を含むため、ロギングとユーザー確認のフローを重視すること。
+3. **継続的な記録**: 各タスクの終了時には `.gemini/blog/` に日報（書き手：はかせの助手・Geminiたん）を記述すること。
+4. **Issue駆動**: 新機能や改善は必ず GitHub Issues に立ち上げ、進捗を管理すること。
 
-### コーディング規約
-- ES6+を使用（async/await推奨）
-- セミコロン必須
-- シングルクォート使用
-- インデント: 2スペース
+## 🚀 開発フロー
 
-### ファイル変更時の注意
-- `manifest.json`: 権限追加時は最小限に
-- `background.js`: Service Workerの制約を考慮（長時間処理不可）
-- `popup.js/options.js`: DOM操作はDOMContentLoaded後に
-
-### ストレージ設計
-```javascript
-// chrome.storage.sync - 設定（デバイス間同期）
-{
-  warnTime: '18:00',
-  closeTime: '21:00',
-  enableTimer: true,
-  enableNotification: true,
-  enableSound: false,
-  enableSpreadsheet: false,
-  spreadsheetUrl: '',
-  sheetName: 'タブ記録'
-}
-
-// chrome.storage.local - 履歴（ローカルのみ）
-{
-  tabHistory: [
-    {
-      date: '2024-01-15T21:00:00.000Z',
-      tabs: [
-        { title: 'Example', url: 'https://example.com' },
-        // ...
-      ]
-    }
-  ]
-}
-```
-
-## 🧪 テスト方法
-
-### 手動テスト
-1. `chrome://extensions` で拡張機能を読み込み
-2. ポップアップの各ボタンをテスト
-3. 設定画面の保存/読み込みをテスト
-4. アラームのテスト（時刻を現在時刻+1分に設定）
-
-### デバッグ
-- ポップアップ: 右クリック → 検証
-- バックグラウンド: `chrome://extensions` → 「Service Worker」リンク
-- ストレージ確認: DevTools → Application → Storage
-
-## 📝 タスク管理
-
-### 現在のステータス: v0.1 MVP
-
-### 未実装機能（優先度順）
-
-1. **アイコン作成** - icons/フォルダが空
-2. **GAS連携実装** - `gas/Code.gs`の作成
-3. **レビューモード** - タブごとの残す/閉じる選択
-4. **エラーハンドリング強化**
-
-### 既知の問題
-- Service Workerはアイドル時に停止するため、正確なタイミングが保証されない
-- `chrome://` や `chrome-extension://` のタブは閉じられない場合がある
-
-## 🚀 デプロイ
-
-### Chrome Web Store公開時のチェックリスト
-- [ ] プライバシーポリシーの作成
-- [ ] スクリーンショットの準備
-- [ ] アイコンの最終確認
-- [ ] 権限の説明文作成
-
-## 💡 AI/エージェントへの推奨事項
-
-### やること
-- 変更前に影響範囲を確認
-- Chrome Extension APIのドキュメントを参照
-- 既存のコードスタイルに従う
-- 日本語でコメントを書く
-
-### やらないこと
-- 不要な外部ライブラリの追加
-- manifest.jsonの権限を不必要に増やす
-- 非同期処理を同期的に書く
-
-### 質問する場合
-- 「この機能を追加したい場合、どのファイルを変更すべきか」
-- 「Chrome APIの○○を使いたいが、Manifest V3で可能か」
-- 「既存の設計と整合性を保つにはどうすべきか」
+1. `PLANNING`: `implementation_plan.md` を作成し、ユーザーの合意を得る。
+2. `EXECUTION`: 機能を実装し、必要に応じてリファクタリングを行う。
+3. `VERIFICATION`: `walkthrough.md` を作成し、動作検証結果を報告する。
+4. `LOGGING`: `changelog.md` と日報を更新して完了。
 
 ---
-
-最終更新: 2024年
+最終更新: 2026-01-12 (AIDX Lab)
