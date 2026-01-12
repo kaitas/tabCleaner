@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tab Cleanup - Organize your browser, calm your mind.</title>
+    <title>TabCleaner - Your Browser Angel</title>
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,12 +12,75 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+JP:wght@400;500;700&display=swap"
         rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Landing specific overrides */
+        .hero {
+            background: linear-gradient(135deg, #fdfbf7 0%, #eef2ff 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #dbeafe;
+            color: #2563eb;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .gamification-section {
+            padding: 80px 0;
+            background: #fff;
+            text-align: center;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .game-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            border-color: #6366f1;
+        }
+
+        .game-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 
 <body>
     <header class="header">
         <div class="container">
-            <div class="logo">🧹 Tab Cleanup</div>
+            <div class="logo">
+                <i data-lucide="feather"></i> TabCleaner
+            </div>
             <nav class="nav">
                 <a href="#features" data-i18n="nav.features">Features</a>
                 <a href="howto.html" data-i18n="nav.howto">How To Use</a>
@@ -32,38 +95,79 @@
     <main>
         <section class="hero">
             <div class="container hero-content">
-                <h1 data-i18n="hero.title">Too many tabs,<br>Too much noise.</h1>
-                <p class="hero-sub" data-i18n="hero.sub">Tab Cleanup gently organizes your excessive tabs<br>and
-                    restores your focus.</p>
+                <div class="hero-badge">
+                    <i data-lucide="sparkles" size="16"></i> v0.4 New: Gamification Update
+                </div>
+                <h1 data-i18n="hero.title">Meet Your<br>Browser Angel.</h1>
+                <p class="hero-sub" data-i18n="hero.sub">
+                    TabCleaner is not just a tool; it's a companion that gamifies your digital decluttering.
+                    Close tabs, earn Karma, and compete globally.
+                </p>
                 <div class="hero-actions">
                     <a href="#" class="btn btn-primary" data-i18n="hero.cta_main">Add to Chrome (Free)</a>
-                    <a href="#features" class="btn btn-secondary" data-i18n="hero.cta_sub">Learn More</a>
+                    <a href="#game" class="btn btn-secondary" data-i18n="hero.cta_sub">Explore Game Features</a>
                 </div>
             </div>
-            <div class="hero-bg"></div>
+            <div class="hero-bg">
+                <!-- Abstract visual or Mascot placeholder -->
+            </div>
         </section>
 
         <section id="features" class="features">
             <div class="container">
-                <h2 data-i18n="features.title">Core Features</h2>
+                <h2 data-i18n="features.title">Core Utilities</h2>
                 <div class="feature-grid">
                     <div class="feature-card">
                         <div class="icon">📋</div>
                         <h3 data-i18n="feature.1.title">One-Click Copy</h3>
-                        <p data-i18n="feature.1.desc">Copy all open tab titles and URLs to your clipboard in a clean
-                            text format instantly.</p>
+                        <p data-i18n="feature.1.desc">Copy all open tab titles and URLs to your clipboard instantly for
+                            easy sharing or saving.</p>
                     </div>
                     <div class="feature-card">
                         <div class="icon">⏰</div>
-                        <h3 data-i18n="feature.2.title">Gentle Reminder</h3>
-                        <p data-i18n="feature.2.desc">Get a friendly notification at your set time to declutter your
-                            browser.</p>
+                        <h3 data-i18n="feature.2.title">Smart Reminders</h3>
+                        <p data-i18n="feature.2.desc">Set daily cleanup times. Your Angel will gently nudge you when
+                            it's time to let go.</p>
                     </div>
                     <div class="feature-card">
                         <div class="icon">📊</div>
-                        <h3 data-i18n="feature.3.title">Track History</h3>
-                        <p data-i18n="feature.3.desc">Connect with Google Spreadsheet to automatically log your tab
-                            usage history.</p>
+                        <h3 data-i18n="feature.3.title">History Sync</h3>
+                        <p data-i18n="feature.3.desc">Sync connected with Google Sheets to keep a permanent log of your
+                            refined browsing history.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Gamification Section -->
+        <section id="game" class="gamification-section">
+            <div class="container">
+                <h2 style="font-size: 32px; margin-bottom: 16px;">Gamify Your Cleanup</h2>
+                <p style="color: #64748b; max-width: 600px; margin: 0 auto;">
+                    Turn specific tab closing actions into a rewarding game.
+                    Simple rules, satisfying feedback.
+                </p>
+
+                <div class="game-grid">
+                    <div class="game-card">
+                        <div class="game-icon"><i data-lucide="coins"></i></div>
+                        <h3>Earn Karma</h3>
+                        <p>Every tab you close grants you <strong>+10 Karma</strong>. Watch your score grow as you
+                            purify your browser.</p>
+                    </div>
+                    <div class="game-card">
+                        <div class="game-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);"><i
+                                data-lucide="flame"></i></div>
+                        <h3>Fever Time</h3>
+                        <p>Between <strong>18:00 - 22:00</strong> is happy hour. All Karma earned is <strong>Doubled
+                                (x2)</strong>. It's the perfect time to clean up!</p>
+                    </div>
+                    <div class="game-card">
+                        <div class="game-icon" style="background: linear-gradient(135deg, #10b981, #059669);"><i
+                                data-lucide="globe"></i></div>
+                        <h3>Global Ranking</h3>
+                        <p>Your daily efforts are aggregated and ranked against users in your region (APAC, EMEA, AMER).
+                            Compete for the cleanest browser.</p>
                     </div>
                 </div>
             </div>
@@ -72,11 +176,20 @@
 
     <footer class="footer">
         <div class="container">
-            <p data-i18n="footer.copy">&copy; 2024 Tab Cleanup Project. Open Source on GitHub.</p>
+            <p data-i18n="footer.copy">&copy; 2026 TabCleaner Project. Open Source on GitHub.</p>
+            <div style="margin-top: 10px;">
+                <a href="privacy.html"
+                    style="color: #94a3b8; text-decoration: none; font-size: 14px; margin-right: 15px;">Privacy
+                    Policy</a>
+                <a href="tos.html" style="color: #94a3b8; text-decoration: none; font-size: 14px;">Terms of Service</a>
+            </div>
         </div>
     </footer>
 
     <script type="module" src="js/main.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 
 </html>
