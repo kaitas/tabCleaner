@@ -3,6 +3,7 @@ const warnTimeInput = document.getElementById('warnTime');
 const closeTimeInput = document.getElementById('closeTime');
 const enableTimerInput = document.getElementById('enableTimer');
 const spreadsheetUrlInput = document.getElementById('spreadsheetUrl');
+const spreadsheetViewUrlInput = document.getElementById('spreadsheetViewUrl');
 const sheetNameInput = document.getElementById('sheetName');
 const enableSpreadsheetInput = document.getElementById('enableSpreadsheet');
 const enableNotificationInput = document.getElementById('enableNotification');
@@ -70,6 +71,7 @@ const defaultSettings = {
   closeTime: '21:00',
   enableTimer: true,
   spreadsheetUrl: '',
+  spreadsheetViewUrl: '',
   sheetName: 'tabCleaner',
   enableSpreadsheet: false,
   enableNotification: true,
@@ -91,7 +93,8 @@ async function loadSettings() {
   closeTimeInput.value = settings.closeTime;
   enableTimerInput.checked = settings.enableTimer;
   spreadsheetUrlInput.value = settings.spreadsheetUrl;
-  sheetNameInput.value = settings.sheetName || 'tabCleaner';
+  if (spreadsheetViewUrlInput) spreadsheetViewUrlInput.value = settings.spreadsheetViewUrl || '';
+  if (sheetNameInput) sheetNameInput.value = settings.sheetName || 'tabCleaner';
   enableSpreadsheetInput.checked = settings.enableSpreadsheet;
   enableNotificationInput.checked = settings.enableNotification;
   enableSoundInput.checked = settings.enableSound;
@@ -104,7 +107,8 @@ async function saveSettings() {
     closeTime: closeTimeInput.value,
     enableTimer: enableTimerInput.checked,
     spreadsheetUrl: spreadsheetUrlInput.value.trim(),
-    sheetName: sheetNameInput.value.trim(),
+    spreadsheetViewUrl: spreadsheetViewUrlInput ? spreadsheetViewUrlInput.value.trim() : '',
+    sheetName: sheetNameInput ? sheetNameInput.value.trim() : 'tabCleaner',
     enableSpreadsheet: enableSpreadsheetInput.checked,
     enableNotification: enableNotificationInput.checked,
     enableSound: enableSoundInput.checked
