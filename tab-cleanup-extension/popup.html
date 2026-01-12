@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tab Cleanup</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      padding: 16px;
+    }
+    h1 {
+      font-size: 18px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .stats {
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .stats-value {
+      font-weight: bold;
+      font-size: 20px;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: transform 0.1s, opacity 0.1s;
+    }
+    .btn:hover {
+      transform: scale(1.02);
+    }
+    .btn:active {
+      transform: scale(0.98);
+    }
+    .btn-primary {
+      background: #fff;
+      color: #667eea;
+    }
+    .btn-warning {
+      background: #fbbf24;
+      color: #1f2937;
+    }
+    .btn-danger {
+      background: #ef4444;
+      color: #fff;
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+    .status {
+      font-size: 12px;
+      text-align: center;
+      opacity: 0.8;
+      margin-top: 8px;
+    }
+    .footer {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+    .footer a {
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+    }
+    .footer a:hover {
+      color: #fff;
+    }
+    .toast {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      background: #10b981;
+      color: #fff;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 13px;
+      display: none;
+    }
+    .toast.show {
+      display: block;
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <h1>🧹 Tab Cleanup</h1>
+  
+  <div class="stats">
+    <div class="stats-row">
+      <span>開いているタブ</span>
+      <span class="stats-value" id="tabCount">-</span>
+    </div>
+    <div class="stats-row">
+      <span>警告時刻</span>
+      <span id="warnTime">18:00</span>
+    </div>
+    <div class="stats-row">
+      <span>終了時刻</span>
+      <span id="closeTime">21:00</span>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" id="copyBtn">📋 タブ一覧をコピー</button>
+  <button class="btn btn-warning" id="reviewBtn">👀 タブを確認する</button>
+  <button class="btn btn-danger" id="closeAllBtn">🚪 全て閉じて記録</button>
+  <button class="btn btn-secondary" id="exportBtn">📝 ブログ用に出力</button>
+
+  <div class="status" id="status"></div>
+
+  <div class="footer">
+    <a href="options.html" target="_blank">⚙️ 設定</a>
+    <span>v0.1.0</span>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
