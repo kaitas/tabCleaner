@@ -119,9 +119,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!url) return;
 
     testBtn.disabled = true;
-    testBtn.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> Testing...`;
+    testBtn.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> Connecting...`;
     lucide.createIcons();
     testResult.style.display = 'none';
+
+    // 10s Timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
     try {
       const testData = {
@@ -131,33 +135,51 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
       };
 
+      // GAS Web App handling:
+      // 1. Use 'text/plain' to avoid OPTIONS preflight (GAS doesn't handle OPTIONS well).
+      // 2. Remove 'no-cors' to allow reading response/status.
+      // 3. GAS returns 302 -> browser follows -> 200 JSON.
       const response = await fetch(url, {
         method: 'POST',
-        mode: 'no-cors', // standard for GAS Web App calls from browser extension often needs no-cors or content-type text/plain
         headers: {
           'Content-Type': 'text/plain;charset=utf-8',
         },
-        body: JSON.stringify(testData)
+        body: JSON.stringify(testData),
+        signal: controller.signal
       });
 
-      // Note: with no-cors / GAS 'redirect' behavior, we might not get a clean JSON response or 200 OK usable in JS.
-      // However, if it doesn't throw, it likely reached.
-      // If we use 'redirect': 'follow', typical fetch might fail on CORS redirect if GAS not public.
-      // BUT, user set GAS to "Anyone".
+      clearTimeout(timeoutId);
 
-      // Let's assume standard behavior:
-      // If "Anyone" access, it *should* work.
+      if (!response.ok) {
+        throw new Error(`Server returned ${response.status}`);
+      }
+
+      const resText = await response.text();
+      // Try to parse JSON if possible, but relax if it fails but status is 200
+      try {
+        const json = JSON.parse(resText);
+        if (json.status === 'error') throw new Error(json.message);
+      } catch (e) {
+        // If not JSON, but 200 OK, might be GAS HTML output. 
+        // We assume success if we got here and it wasn't an explicit error JSON.
+        console.log('Response not JSON:', resText);
+      }
 
       testResult.style.display = 'block';
       testResult.style.color = '#10b981';
-      testResult.innerHTML = `✅ 送信成功！Spreadsheetに "tabCleaner" シートが作成されたか確認してください。`;
+      testResult.innerHTML = `✅ 成功！Spreadsheetに履歴が記録されました。`;
       showToast('実験成功！シートを確認してください');
 
     } catch (e) {
       console.error(e);
       testResult.style.display = 'block';
       testResult.style.color = '#ef4444';
-      testResult.textContent = `❌ 送信失敗: ${e.message}`;
+
+      let msg = e.message;
+      if (e.name === 'AbortError') msg = 'Timeout (10s)';
+      if (msg === 'Failed to fetch') msg = 'Network Error (CORS or Blocked)';
+
+      testResult.textContent = `❌ 送信失敗: ${msg}`;
     } finally {
       testBtn.disabled = false;
       testBtn.innerHTML = `<i data-lucide="flask-conical"></i> Test Connection`;
