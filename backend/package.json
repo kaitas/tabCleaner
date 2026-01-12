@@ -1,0 +1,17 @@
+{
+    "name": "tab-cleaner-backend",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "deploy": "wrangler deploy",
+        "dev": "wrangler dev",
+        "start": "wrangler dev"
+    },
+    "devDependencies": {
+        "wrangler": "^3.0.0"
+    },
+    "dependencies": {
+        "hono": "^3.0.0"
+    }
+}

@@ -1,6 +1,7 @@
 // Tab Cleanup - Background Service Worker
 import { processTabClose, isFeverTime } from './gamification.js';
 import { getNotificationContent } from './notifications.js';
+import { checkForUpdates } from './updates.js';
 
 // デフォルト設定
 const defaultSettings = {
@@ -15,33 +16,88 @@ const defaultSettings = {
 };
 
 // ---------------------------------------------------------
-// Game Logic Integration (Pending Buffer)
+// Game Logic Integration
 // ---------------------------------------------------------
-let closedTabsBuffer = 0;
+let closedNormalTabsBuffer = 0;
+let closedBlankTabsBuffer = 0;
 let flushTimeout = null;
 
+// Keep track of tab URLs to detect "Blank" tabs
+const tabUrlMap = new Map();
+
+function isBlankUrl(url) {
+  if (!url) return true;
+  return url === 'chrome://newtab/' || url === 'about:blank';
+}
+
 function flushClosedTabs() {
-  if (closedTabsBuffer > 0) {
-    processTabClose(closedTabsBuffer).then(result => {
-      console.log('Processed closed tabs:', closedTabsBuffer, 'Fever:', result.isFever);
-      if (result && result.addedKarma > 0) {
-        // Optional: Badge update or small notification if needed
-        chrome.action.setBadgeText({ text: 'Karma' });
-        chrome.action.setBadgeBackgroundColor({ color: '#FFD700' }); // Gold
+  if (closedNormalTabsBuffer > 0 || closedBlankTabsBuffer > 0) {
+    processTabClose(closedNormalTabsBuffer, closedBlankTabsBuffer).then(result => {
+      console.log('Processed closed tabs. Normal:', closedNormalTabsBuffer, 'Blank:', closedBlankTabsBuffer, 'ScoreDelta:', result.addedKarma);
+      if (result && result.addedKarma !== 0) {
+        const color = result.addedKarma > 0 ? '#FFD700' : '#808080';
+        chrome.action.setBadgeText({ text: result.addedKarma > 0 ? 'Karma' : 'Loss' });
+        chrome.action.setBadgeBackgroundColor({ color: color });
         setTimeout(() => chrome.action.setBadgeText({ text: '' }), 2000);
       }
     });
-    closedTabsBuffer = 0;
+    closedNormalTabsBuffer = 0;
+    closedBlankTabsBuffer = 0;
   }
 }
 
+// Track URL creation/updates
+chrome.tabs.onCreated.addListener((tab) => {
+  if (tab.id) tabUrlMap.set(tab.id, tab.url || '');
+});
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (tab.url) tabUrlMap.set(tabId, tab.url);
+});
+chrome.tabs.onReplaced.addListener((addedTabId, removedTabId) => {
+  tabUrlMap.delete(removedTabId);
+});
+
 // Listen for tab closure
 chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
-  closedTabsBuffer++;
+  const url = tabUrlMap.get(tabId);
+
+  if (url && isBlankUrl(url)) {
+    closedBlankTabsBuffer++;
+  } else {
+    // If unknown, assume normal (since typical Ctrl+T usage is tracked)
+    closedNormalTabsBuffer++;
+  }
+
+  // Clean up map
+  tabUrlMap.delete(tabId);
 
   if (flushTimeout) clearTimeout(flushTimeout);
   flushTimeout = setTimeout(flushClosedTabs, 2000); // Debounce 2 sec
 });
+
+// Initialize map on startup
+chrome.tabs.query({}, (tabs) => {
+  tabs.forEach(t => tabUrlMap.set(t.id, t.url));
+});
+
+
+// ---------------------------------------------------------
+// Update Check Logic
+// ---------------------------------------------------------
+async function performUpdateCheck() {
+  const update = await checkForUpdates();
+  if (update && update.hasUpdate) {
+    chrome.action.setBadgeText({ text: 'NEW' });
+    chrome.action.setBadgeBackgroundColor({ color: '#ff4081' }); // Pink
+
+    showNotification(
+      '✨ New Version Available',
+      `v${update.latestVersion} が公開されました！\nGitHubから更新してください。`,
+      true
+    );
+  }
+}
+
 
 // ---------------------------------------------------------
 // Core Logic
@@ -97,6 +153,11 @@ async function setupAlarms() {
   }
   chrome.alarms.create('rankingAlarm', {
     when: rankingDate.getTime(),
+    periodInMinutes: 24 * 60
+  });
+
+  // Daily Update Check Alarm
+  chrome.alarms.create('updateCheck', {
     periodInMinutes: 24 * 60
   });
 
@@ -170,7 +231,6 @@ async function recordAndCloseTabs() {
       try {
         await chrome.tabs.remove(tab.id);
         closedCount++;
-        // onRemoved listener will pick this up for scoring
       } catch (e) {
         console.log('Could not close tab:', tab.url);
       }
@@ -190,20 +250,11 @@ async function recordAndCloseTabs() {
 // Spreadsheetに保存（GAS Web App経由）
 async function saveToSpreadsheet(tabs, settings) {
   try {
-    // SpreadsheetのURLからIDを抽出
     const match = settings.spreadsheetUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
     if (!match) {
-      console.error('Invalid Spreadsheet URL');
       return;
     }
-
     // GAS Web Appに送信（要別途GASデプロイ）
-    console.log('Spreadsheet save would happen here:', {
-      spreadsheetId: match[1],
-      sheetName: settings.sheetName,
-      tabCount: tabs.length
-    });
-
   } catch (error) {
     console.error('Failed to save to Spreadsheet:', error);
   }
@@ -219,21 +270,24 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   }
 
   if (alarm.name === 'closeAlarm') {
+    const content = getNotificationContent('close');
+    showNotification(content.title, content.message, true);
     await recordAndCloseTabs();
-    // Notification handled inside recordAndCloseTabs
   }
 
   if (alarm.name === 'rankingAlarm') {
     const content = getNotificationContent('ranking');
     showNotification(content.title, content.message);
-    // TODO: R2 submission Logic here
+  }
+
+  if (alarm.name === 'updateCheck') {
+    await performUpdateCheck();
   }
 });
 
 // 通知ボタンクリック時の処理
 chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
   if (buttonIndex === 0) {
-    // 「今すぐ確認」- ポップアップを開く代わりに新しいタブで設定を開く
     chrome.tabs.create({ url: 'popup.html' });
   }
   chrome.notifications.clear(notificationId);
@@ -260,10 +314,14 @@ chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     chrome.tabs.create({ url: 'welcome.html' });
   }
+
+  // Check for updates on install/update interaction
+  performUpdateCheck();
 });
 
 // ブラウザ起動時
 chrome.runtime.onStartup.addListener(() => {
   console.log('Browser started, setting up alarms');
   setupAlarms();
+  performUpdateCheck();
 });

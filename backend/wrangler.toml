@@ -1,0 +1,18 @@
+name = "tab-cleaner-worker"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+# R2 Bucket Binding
+[[r2_buckets]]
+binding = "RANKING_BUCKET"
+bucket_name = "tab-cleaner-stats"
+preview_bucket_name = "tab-cleaner-stats-preview"
+
+# KV Namespace for Rate Limiting (Optional, using if available)
+# [[kv_namespaces]]
+# binding = "RATE_LIMIT_KV"
+# id = "..."
+
+[vars]
+# Secret for HMAC signature (Will be set via `wrangler secret put` in prod)
+# API_SECRET = "placeholder-secret-for-dev"

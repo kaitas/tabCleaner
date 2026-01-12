@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Tab Cleanup - タブ断捨離",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "description": "開きすぎのタブを整理し、記録してから気持ちよく1日を終える",
   "permissions": [
     "tabs",

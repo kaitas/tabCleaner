@@ -1,0 +1,17 @@
+# System
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+backend/node_modules/
+
+# Cloudflare
+.wrangler/
+
+# Build
+dist/
+*.zip
+
+# Env
+.env

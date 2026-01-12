@@ -6,6 +6,7 @@
 const FEVER_START_HOUR = 18;
 const FEVER_END_HOUR = 22;
 const BASE_SCORE_CLOSE = 10;
+const SCORE_PENALTY_BLANK = -1;
 const FEVER_MULTIPLIER = 2;
 
 // Initial state
@@ -42,36 +43,41 @@ export function isFeverTime() {
 }
 
 /**
- * Calculates the score for closing a certain number of tabs.
- * @param {number} count Number of tabs closed
+ * Calculates the score for closing tabs.
+ * @param {number} normalCount Number of normal tabs closed
+ * @param {number} blankCount Number of blank/new tabs closed (penalty)
  */
-export function calculateScore(count) {
+export function calculateScore(normalCount, blankCount) {
     let multiplier = 1;
     if (isFeverTime()) {
         multiplier = FEVER_MULTIPLIER;
     }
-    return count * BASE_SCORE_CLOSE * multiplier;
+
+    const normalScore = normalCount * BASE_SCORE_CLOSE * multiplier;
+    const penaltyScore = blankCount * SCORE_PENALTY_BLANK; // No multiplier for negative? Or yes? Usually penalties are flat or also multiplied. Let's keep flat for now unless requested.
+
+    return normalScore + penaltyScore;
 }
 
 /**
  * Updates the state after closing tabs.
- * @param {number} count Number of tabs closed
+ * @param {number} normalCount Number of normal tabs closed
+ * @param {number} blankCount Number of blank tabs closed
  * @returns {object} The updated state and score delta
  */
-export async function processTabClose(count) {
-    if (count <= 0) return null;
+export async function processTabClose(normalCount, blankCount = 0) {
+    if (normalCount <= 0 && blankCount <= 0) return null;
 
     const state = await loadGameState();
-    const scoreDelta = calculateScore(count);
+    const scoreDelta = calculateScore(normalCount, blankCount);
+    const totalCount = normalCount + blankCount;
 
     state.karma += scoreDelta;
-    state.totalTabsClosed += count;
+    state.totalTabsClosed += totalCount;
 
     // Check for badges (Simple examples)
-    // v0.4.1: Add more complex badge logic later
     if (state.totalTabsClosed >= 100 && !state.badges.includes('novice_cleaner')) {
         state.badges.push('novice_cleaner');
-        // We might want to notify about new badge here
     }
 
     await saveGameState(state);
@@ -81,12 +87,4 @@ export async function processTabClose(count) {
         addedKarma: scoreDelta,
         isFever: isFeverTime()
     };
-}
-
-/**
- * Resets the daily counters (if we decide to have daily limits/streaks)
- * Call this periodically if needed.
- */
-export async function checkDailyReset() {
-    // Placeholder for daily streak logic
 }
