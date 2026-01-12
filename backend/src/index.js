@@ -40,11 +40,24 @@ app.post('/submit-score', async (c) => {
             return c.json({ error: 'Score exceeds daily limit. Cheat detected?' }, 400);
         }
 
-        // 2. Region Detection
+        // 2. Region Detection (3 Regions Strategy)
         // Cloudflare Workers provides location data in c.req.raw.cf
-        // Fallback to 'UTC' if not available (e.g. local dev)
         const cf = c.req.raw.cf;
-        const region = cf?.timezone || 'UTC'; // e.g., "Asia/Tokyo"
+        const timezone = cf?.timezone || 'UTC';
+
+        let region = 'APAC'; // Default
+
+        // Simple 3-region mapping based on continent prefix
+        const lowerTz = timezone.toLowerCase();
+        if (lowerTz.startsWith('america') || lowerTz.startsWith('pacific/honolulu')) {
+            region = 'AMER';
+        } else if (lowerTz.startsWith('europe') || lowerTz.startsWith('africa') || lowerTz.startsWith('atlantic')) {
+            region = 'EMEA';
+        } else {
+            // Asia, Australia, Pacific, etc.
+            region = 'APAC';
+        }
+
         const country = cf?.country || 'XX';
 
         // Group by broad regions if needed, but Timezone is good for local 22:00 calculation
