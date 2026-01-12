@@ -169,12 +169,12 @@ async function setupAlarms() {
 }
 
 // 通知を表示
-async function showNotification(title, message, requireInteraction = false) {
+async function showNotification(title, message, requireInteraction = false, id = null) {
   const settings = await chrome.storage.sync.get(defaultSettings);
 
   if (!settings.enableNotification) return;
 
-  chrome.notifications.create({
+  const options = {
     type: 'basic',
     iconUrl: 'icons/icon128.png',
     title: title,
@@ -184,7 +184,14 @@ async function showNotification(title, message, requireInteraction = false) {
       { title: '今すぐ確認' },
       { title: '後で' }
     ]
-  });
+  };
+
+  // Use specific ID if provided, otherwise auto-generated
+  if (id) {
+    chrome.notifications.create(id, options);
+  } else {
+    chrome.notifications.create(options);
+  }
 }
 
 // タブ一覧を取得
@@ -288,7 +295,13 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 // 通知ボタンクリック時の処理
 chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
   if (buttonIndex === 0) {
-    chrome.tabs.create({ url: 'popup.html' });
+    if (notificationId === 'update_available') {
+      // Update通知の場合は拡張機能管理ページを開く
+      chrome.tabs.create({ url: 'chrome://extensions/' });
+    } else {
+      // 通常の通知はポップアップ（またはダッシュボード）
+      chrome.tabs.create({ url: 'popup.html' });
+    }
   }
   chrome.notifications.clear(notificationId);
 });
