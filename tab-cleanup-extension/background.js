@@ -1,5 +1,5 @@
 // Tab Cleanup - Background Service Worker
-import { processTabClose, isFeverTime } from './gamification.js';
+import { processTabClose, isFeverTime, loadGameState } from './gamification.js';
 import { getNotificationContent } from './notifications.js';
 import { checkForUpdates } from './updates.js';
 
@@ -267,6 +267,59 @@ async function saveToSpreadsheet(tabs, settings) {
   }
 }
 
+// ---------------------------------------------------------
+// Ranking Submission Logic
+// ---------------------------------------------------------
+const RANKING_API_URL = 'https://tab-cleaner-worker.aki-2c0.workers.dev/submit-score';
+
+async function getOrCreateUUID() {
+  const { userUUID } = await chrome.storage.sync.get('userUUID');
+  if (userUUID) return userUUID;
+
+  const newUUID = crypto.randomUUID();
+  await chrome.storage.sync.set({ userUUID: newUUID });
+  return newUUID;
+}
+
+async function submitDailyRanking() {
+  try {
+    // Get Data
+    const state = await loadGameState();
+    const { angelName } = await chrome.storage.sync.get('angelName');
+    const uuid = await getOrCreateUUID();
+
+    // Payload
+    const payload = {
+      uuid: uuid,
+      angelName: angelName || 'Anonymous Angel',
+      karma: state.karma,
+      tabsClosed: state.totalTabsClosed,
+      timestamp: new Date().toISOString()
+    };
+
+    console.log('Submitting ranking score...', payload);
+
+    // Send to Cloudflare Worker
+    const response = await fetch(RANKING_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || 'Server error');
+    }
+
+    console.log('Ranking submitted successfully');
+
+  } catch (e) {
+    console.error('Failed to submit ranking:', e);
+  }
+}
+
 // アラーム発火時の処理
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   console.log('Alarm fired:', alarm.name);
@@ -285,6 +338,9 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === 'rankingAlarm') {
     const content = getNotificationContent('ranking');
     showNotification(content.title, content.message);
+
+    // Submit to Backend
+    await submitDailyRanking();
   }
 
   if (alarm.name === 'updateCheck') {
