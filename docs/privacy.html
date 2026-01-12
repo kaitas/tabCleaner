@@ -7,6 +7,54 @@
     <title>Tab Cleanup - Privacy Policy</title>
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .lang-switch {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        .lang-switch button {
+            padding: 8px 16px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .lang-switch button.active {
+            background: #667eea;
+            color: white;
+        }
+        .lang-en, .lang-ja { display: none; }
+        .lang-en.active, .lang-ja.active { display: block; }
+        .privacy-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .privacy-section h3 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #667eea;
+            color: white;
+        }
+        .data-yes { color: #16a34a; font-weight: bold; }
+        .data-no { color: #dc2626; font-weight: bold; }
+    </style>
 </head>
 
 <body>
@@ -14,7 +62,7 @@
         <div class="container">
             <div class="logo">
                 <a href="https://akihiko.shirai.as/tabCleaner" style="color:inherit; text-decoration:none;">
-                    🧹 Tab Cleanup
+                    Tab Cleanup
                 </a>
             </div>
             <nav class="nav">
@@ -23,36 +71,337 @@
         </div>
     </header>
 
-    <main class="container" style="padding: 120px 20px 60px;">
-        <h1>Privacy Policy</h1>
-        <p>Last updated: 2026-01-12</p>
+    <main class="container" style="padding: 120px 20px 60px; max-width: 800px;">
 
-        <h2>1. Overview</h2>
-        <p>"Tab Cleanup" (hereinafter referred to as "the Extension") respects your privacy. We operate under a "Local
-            First" philosophy.</p>
+        <div class="lang-switch">
+            <button id="btn-en" class="active" onclick="switchLang('en')">English</button>
+            <button id="btn-ja" onclick="switchLang('ja')">日本語</button>
+        </div>
 
-        <h2>2. Data Collection</h2>
-        <p>We do NOT collect your browsing history, personal information, or specific URLs on our servers without your
-            explicit consent.</p>
+        <!-- English Version -->
+        <div id="content-en" class="lang-en active">
+            <h1>Privacy Policy</h1>
+            <p><strong>Last updated:</strong> January 12, 2026</p>
+            <p><strong>Extension ID:</strong> fcdhjhepmfcpnhimecnmgniakhccpoff</p>
 
-        <h3>2.1 Local Data</h3>
-        <p>All detailed tab data is stored locally in your browser (`chrome.storage.local`) or in the Google Spreadsheet
-            you own and connected.</p>
+            <div class="privacy-section">
+                <h3>1. Overview</h3>
+                <p>"Tab Cleanup" (hereinafter "the Extension") is committed to protecting your privacy. We follow a <strong>"Local First"</strong> philosophy - your data stays on your device unless you explicitly choose otherwise.</p>
+            </div>
 
-        <h3>2.2 Statistical Data (Optional)</h3>
-        <p>Only if you explicitly opt-in to the "Global Stats" feature, we collect anonymized data:
-        <ul>
-            <li>Randomly generated User ID (UUID)</li>
-            <li>Number of tabs closed</li>
-            <li>Timestamps</li>
-        </ul>
-        </p>
+            <div class="privacy-section">
+                <h3>2. Data We Collect</h3>
 
-        <h2>3. Third-Party Services</h2>
-        <p>We use Cloudflare R2 and Workers for statistical data processing (if opted in).</p>
+                <h4>2.1 Data Collected Automatically</h4>
+                <table>
+                    <tr>
+                        <th>Data Type</th>
+                        <th>Collected?</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td>Tab URLs and Titles</td>
+                        <td><span class="data-yes">Yes (Local Only)</span></td>
+                        <td>To display tab list and export to Markdown</td>
+                    </tr>
+                    <tr>
+                        <td>Number of Tabs Closed</td>
+                        <td><span class="data-yes">Yes (Local Only)</span></td>
+                        <td>To track your cleanup history</td>
+                    </tr>
+                    <tr>
+                        <td>Personal Information</td>
+                        <td><span class="data-no">No</span></td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Browsing History</td>
+                        <td><span class="data-no">No</span></td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Passwords/Credentials</td>
+                        <td><span class="data-no">No</span></td>
+                        <td>-</td>
+                    </tr>
+                </table>
 
-        <h2>4. Contact</h2>
-        <p>Please contact us via GitHub Issues for any privacy concerns.</p>
+                <h4>2.2 Data You Choose to Share (Optional)</h4>
+                <table>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Data Sent</th>
+                        <th>Destination</th>
+                    </tr>
+                    <tr>
+                        <td>Google Sheets Integration</td>
+                        <td>Tab URLs, Titles, Timestamps</td>
+                        <td>Your own Google Spreadsheet</td>
+                    </tr>
+                    <tr>
+                        <td>Global Karma Ranking</td>
+                        <td>Anonymous User ID, Tab Count, Region</td>
+                        <td>Cloudflare Workers (our server)</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="privacy-section">
+                <h3>3. How We Use Your Data</h3>
+                <ul>
+                    <li><strong>Local Storage:</strong> Settings and history are stored in <code>chrome.storage.local</code> on your device.</li>
+                    <li><strong>Google Sheets:</strong> If enabled, tab data is sent to your own spreadsheet via Google Apps Script.</li>
+                    <li><strong>Ranking:</strong> If opted-in, only anonymized statistics are sent to display global rankings.</li>
+                </ul>
+                <p><strong>We do NOT:</strong></p>
+                <ul>
+                    <li>Sell your data to third parties</li>
+                    <li>Use your data for advertising</li>
+                    <li>Track your browsing behavior</li>
+                    <li>Share personal information with anyone</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h3>4. Third-Party Services</h3>
+                <table>
+                    <tr>
+                        <th>Service</th>
+                        <th>Purpose</th>
+                        <th>Data Shared</th>
+                    </tr>
+                    <tr>
+                        <td>Google Apps Script</td>
+                        <td>Spreadsheet integration (optional)</td>
+                        <td>Tab data to your own sheet</td>
+                    </tr>
+                    <tr>
+                        <td>Cloudflare Workers/R2</td>
+                        <td>Ranking system (optional)</td>
+                        <td>Anonymous ID, tab count</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="privacy-section">
+                <h3>5. Data Retention</h3>
+                <ul>
+                    <li><strong>Local Data:</strong> Stored until you clear it or uninstall the extension</li>
+                    <li><strong>Ranking Data:</strong> Daily rankings are reset every 24 hours</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h3>6. Your Rights</h3>
+                <ul>
+                    <li><strong>Access:</strong> View your data in the extension's Options page</li>
+                    <li><strong>Delete:</strong> Clear history from Options, or uninstall the extension</li>
+                    <li><strong>Opt-out:</strong> Disable Google Sheets or Ranking features anytime</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h3>7. Permissions Explained</h3>
+                <table>
+                    <tr>
+                        <th>Permission</th>
+                        <th>Why We Need It</th>
+                    </tr>
+                    <tr>
+                        <td><code>tabs</code></td>
+                        <td>To read tab URLs/titles and close tabs</td>
+                    </tr>
+                    <tr>
+                        <td><code>storage</code></td>
+                        <td>To save your settings and history locally</td>
+                    </tr>
+                    <tr>
+                        <td><code>alarms</code></td>
+                        <td>To schedule reminder notifications</td>
+                    </tr>
+                    <tr>
+                        <td><code>notifications</code></td>
+                        <td>To show cleanup reminders</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="privacy-section">
+                <h3>8. Contact</h3>
+                <p>For privacy questions or concerns:</p>
+                <ul>
+                    <li>GitHub: <a href="https://github.com/kaitas/tabCleaner/issues">github.com/kaitas/tabCleaner/issues</a></li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h3>9. Changes to This Policy</h3>
+                <p>We may update this policy occasionally. Changes will be posted on this page with an updated date.</p>
+            </div>
+        </div>
+
+        <!-- Japanese Version -->
+        <div id="content-ja" class="lang-ja">
+            <h1>プライバシーポリシー</h1>
+            <p><strong>最終更新日:</strong> 2026年1月12日</p>
+            <p><strong>拡張機能ID:</strong> fcdhjhepmfcpnhimecnmgniakhccpoff</p>
+
+            <div class="privacy-section">
+                <h3>1. 概要</h3>
+                <p>「Tab Cleanup」（以下「本拡張機能」）は、ユーザーのプライバシー保護に取り組んでいます。<strong>「ローカルファースト」</strong>の理念に基づき、明示的に選択しない限り、データは端末内に保存されます。</p>
+            </div>
+
+            <div class="privacy-section">
+                <h3>2. 収集するデータ</h3>
+
+                <h4>2.1 自動的に収集されるデータ</h4>
+                <table>
+                    <tr>
+                        <th>データの種類</th>
+                        <th>収集</th>
+                        <th>目的</th>
+                    </tr>
+                    <tr>
+                        <td>タブのURLとタイトル</td>
+                        <td><span class="data-yes">あり（ローカルのみ）</span></td>
+                        <td>タブ一覧の表示とMarkdownエクスポート</td>
+                    </tr>
+                    <tr>
+                        <td>閉じたタブ数</td>
+                        <td><span class="data-yes">あり（ローカルのみ）</span></td>
+                        <td>整理履歴の記録</td>
+                    </tr>
+                    <tr>
+                        <td>個人情報</td>
+                        <td><span class="data-no">なし</span></td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>閲覧履歴</td>
+                        <td><span class="data-no">なし</span></td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>パスワード・認証情報</td>
+                        <td><span class="data-no">なし</span></td>
+                        <td>-</td>
+                    </tr>
+                </table>
+
+                <h4>2.2 ユーザーが選択して共有するデータ（任意）</h4>
+                <table>
+                    <tr>
+                        <th>機能</th>
+                        <th>送信データ</th>
+                        <th>送信先</th>
+                    </tr>
+                    <tr>
+                        <td>Googleスプレッドシート連携</td>
+                        <td>タブURL、タイトル、タイムスタンプ</td>
+                        <td>ユーザー自身のGoogleスプレッドシート</td>
+                    </tr>
+                    <tr>
+                        <td>グローバルKarmaランキング</td>
+                        <td>匿名ユーザーID、タブ数、地域</td>
+                        <td>Cloudflare Workers（当方のサーバー）</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="privacy-section">
+                <h3>3. データの利用方法</h3>
+                <ul>
+                    <li><strong>ローカルストレージ:</strong> 設定と履歴は端末内の<code>chrome.storage.local</code>に保存されます。</li>
+                    <li><strong>Googleスプレッドシート:</strong> 有効にした場合、タブデータはGoogle Apps Script経由でユーザー自身のスプレッドシートに送信されます。</li>
+                    <li><strong>ランキング:</strong> オプトインした場合のみ、匿名化された統計データがグローバルランキング表示のために送信されます。</li>
+                </ul>
+                <p><strong>以下のことは行いません:</strong></p>
+                <ul>
+                    <li>第三者へのデータ販売</li>
+                    <li>広告目的でのデータ使用</li>
+                    <li>ブラウジング行動の追跡</li>
+                    <li>個人情報の共有</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h3>4. 第三者サービス</h3>
+                <table>
+                    <tr>
+                        <th>サービス</th>
+                        <th>目的</th>
+                        <th>共有データ</th>
+                    </tr>
+                    <tr>
+                        <td>Google Apps Script</td>
+                        <td>スプレッドシート連携（任意）</td>
+                        <td>タブデータ（ユーザー自身のシートへ）</td>
+                    </tr>
+                    <tr>
+                        <td>Cloudflare Workers/R2</td>
+                        <td>ランキングシステム（任意）</td>
+                        <td>匿名ID、タブ数</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="privacy-section">
+                <h3>5. データの保持期間</h3>
+                <ul>
+                    <li><strong>ローカルデータ:</strong> ユーザーが削除するか、拡張機能をアンインストールするまで保持</li>
+                    <li><strong>ランキングデータ:</strong> デイリーランキングは24時間ごとにリセット</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h3>6. ユーザーの権利</h3>
+                <ul>
+                    <li><strong>アクセス:</strong> 拡張機能のオプションページでデータを確認できます</li>
+                    <li><strong>削除:</strong> オプションから履歴を削除、または拡張機能をアンインストール</li>
+                    <li><strong>オプトアウト:</strong> Googleスプレッドシートやランキング機能はいつでも無効化可能</li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h3>7. 権限の説明</h3>
+                <table>
+                    <tr>
+                        <th>権限</th>
+                        <th>必要な理由</th>
+                    </tr>
+                    <tr>
+                        <td><code>tabs</code></td>
+                        <td>タブのURL・タイトルの取得とタブを閉じる機能</td>
+                    </tr>
+                    <tr>
+                        <td><code>storage</code></td>
+                        <td>設定と履歴のローカル保存</td>
+                    </tr>
+                    <tr>
+                        <td><code>alarms</code></td>
+                        <td>リマインダー通知のスケジュール</td>
+                    </tr>
+                    <tr>
+                        <td><code>notifications</code></td>
+                        <td>整理リマインダーの表示</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="privacy-section">
+                <h3>8. お問い合わせ</h3>
+                <p>プライバシーに関するご質問・ご懸念:</p>
+                <ul>
+                    <li>GitHub: <a href="https://github.com/kaitas/tabCleaner/issues">github.com/kaitas/tabCleaner/issues</a></li>
+                </ul>
+            </div>
+
+            <div class="privacy-section">
+                <h3>9. ポリシーの変更</h3>
+                <p>本ポリシーは随時更新される場合があります。変更は本ページに掲載され、更新日が記載されます。</p>
+            </div>
+        </div>
+
     </main>
 
     <footer class="footer">
@@ -61,6 +410,15 @@
                     style="color:inherit;text-decoration:none;">Home</a></p>
         </div>
     </footer>
+
+    <script>
+        function switchLang(lang) {
+            document.getElementById('content-en').classList.toggle('active', lang === 'en');
+            document.getElementById('content-ja').classList.toggle('active', lang === 'ja');
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.getElementById('btn-ja').classList.toggle('active', lang === 'ja');
+        }
+    </script>
 </body>
 
 </html>
