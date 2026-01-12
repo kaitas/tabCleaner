@@ -8,6 +8,7 @@ backend/node_modules/
 
 # Cloudflare
 .wrangler/
+backend/.wrangler/
 
 # Build
 dist/
