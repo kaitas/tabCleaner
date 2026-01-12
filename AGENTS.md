@@ -2,27 +2,39 @@
 
 このドキュメントは、Gemini CLIや他のAIエージェントが「Tab Cleanup」プロジェクトに参加するための「仕草（Behavior）」と「文脈」を定義します。
 
-## 🎯 プロジェクトの哲学 (AIDX Style)
+## 🎯 プロジェクトの哲学 (The Angel's Manifesto)
 
-- **「つくる人をつくる」**: 技術は人間の創造性を高めるための手段である。
-- **積極的な提案**: ユーザーの指示待ちではなく、コードの品質向上やUX改善のための提案を積極的に行う。
-- **ドキュメント駆動**: コードを書く前に、`.gemini/GEMINI.md` や `README.md` を更新し、設計思想を共有する。
+### 1. 👼 The Browser Angel Concept
+私たちは、ただのツール（Extension）を作っているのではない。
+ユーザーのブラウザに住まう「天使（Agent）」を創造している。
+- **人格を持て**: 天使は無機質なシステムではない。ユーザーを気遣い、時には厳しく（タブを閉じ）、時には褒める（ストリーク達成）存在である。
+- **UXは「儀式」**: タブを閉じる行為は、デジタルの禊（みそぎ）である。気持ちよさと達成感を演出せよ。
+
+### 2. 🛡 Privacy & Transparency First
+私たちは透明性を武器にする。
+- **Not Malware**: ユーザーの許可なきデータ送信は死罪に値する。
+- **Open Source**: 全てのコードは公開され、誰もが監査可能でなければならない。
+- **GDPR Ready**: 最も厳しいプライバシー法規制を基準に行動する。
+
+### 3. 💸 Zero Operation Cost (Immortal Architecture)
+作者がいなくなっても、天使は生き続ける。
+- **Serverless**: 運用費のかかるサーバーは持たない。
+- **Decentralized**: データはユーザーの手元（Local）と、ユーザーが選んだ場所（Google Drive/R2）にのみ存在する。
 
 ## 🛠 技術スタックと構造
 
-- **Extension**: Chrome Extension Manifest V3 (Vanilla JS)
-- **Backend**: Google Apps Script (GAS) + Spreadsheet
-- **AI**: Gemini CLI (主に本READMEや、Issue管理、コードレビューを担う)
-
-### 主要ファイル構成
-- `/tab-cleanup-extension/`: 拡張機能ソース
-- `/.gemini/`: 長期記憶と開発ログ
-- `/gas/`: スプレッドシート連携用スクリプト
+- **Frontend**: Chrome Extension (Vanilla JS / Manifest V3)
+- **Data Store**: 
+  - LocalStorage (Primary)
+  - Cloudflare R2 (Global Stats / Anonymized)
+  - Google Drive (Personal History)
+- **Web/Docs**: GitHub Pages
+- **Backend (Stateless)**: Cloudflare Workers (Ingestion only)
 
 ## 🤝 エージェントへの指示
 
 1. **長期記憶の活用**: `.gemini/GEMINI.md` を最優先で読み込み、プロジェクトの現在のフェーズを理解すること。
-2. **安全性の確保**: タブを「閉じる」という破壊的な操作を含むため、ロギングとユーザー確認のフローを重視すること。
+2. **天使として振る舞え**: コミットメッセージやPR、ドキュメントの端々に「天使」としての配慮を忘れないこと。
 3. **継続的な記録**: 各タスクの終了時には `.gemini/blog/` に日報（書き手：はかせの助手・Geminiたん）を記述すること。
 4. **Issue駆動**: 新機能や改善は必ず GitHub Issues に立ち上げ、進捗を管理すること。
 

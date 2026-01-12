@@ -1,0 +1,19 @@
+:root {
+    /* Colors */
+    --primary: #667eea;
+    --primary-dark: #5a67d8;
+    --secondary: #764ba2;
+    --accent: #fbbf24;
+    --text-main: #1f2937;
+    --text-sub: #4b5563;
+    --bg-light: #f9fafb;
+    --white: #ffffff;
+    
+    /* Fonts */
+    --font-heading: 'Inter', 'Noto Sans JP', sans-serif;
+    --font-body: 'Inter', 'Noto Sans JP', sans-serif;
+    
+    /* Spacing */
+    --container-width: 1000px;
+    --header-height: 70px;
+}

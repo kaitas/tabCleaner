@@ -1,0 +1,40 @@
+name: Release & Promote
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Package Extension
+        run: .\scripts\package.ps1
+        
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: tab-cleanup-v*.zip
+          draft: false
+          prerelease: false
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Promote Release
+        run: node scripts/promote.js ${{ github.ref_name }}
+        env:
+          # In a real environment, you would add these secrets to your repository
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # PRODUCT_HUNT_TOKEN: ${{ secrets.PRODUCT_HUNT_TOKEN }}
+          # TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}

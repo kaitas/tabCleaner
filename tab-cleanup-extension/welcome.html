@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meet Your Angel</title>
+    <meta name="theme-color" content="#667eea">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --text: #374151;
+            --bg: #f3f4f6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            width: 100%;
+            background: white;
+            padding: 20px 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 90%;
+            margin: 40px auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #111827;
+            font-weight: bold;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .consent-box {
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .checkbox-label input {
+            margin-top: 4px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .link-sub {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 13px;
+        }
+
+        .link-sub a,
+        .link-sub button {
+            color: var(--text);
+            opacity: 0.6;
+            background: none;
+            border: none;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: inherit;
+        }
+
+        /* Setup Steps for Spreadsheet (Optional accordion maybe?) */
+        .setup-steps {
+            display: none;
+            margin-top: 24px;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 24px;
+        }
+
+        .setup-steps.open {
+            display: block;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* Icons in toast */
+        .toast svg {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1><i data-lucide="feather"></i> Tab Cleanup</h1>
+    </div>
+
+    <div class="container">
+
+        <!-- Step 1: Naming & Consent -->
+        <div class="card" id="step1">
+            <div class="section-title">
+                <i data-lucide="sparkles" color="#fbbf24"></i>
+                <span>Browser Angel Setup</span>
+            </div>
+
+            <p style="margin-bottom: 24px; color: #4b5563;">
+                はじめまして。あなたのブラウザ整理をお手伝いするエージェント（天使）です。<br>
+                私になんと呼びかけますか？
+            </p>
+
+            <div class="input-group">
+                <label>👼 Angel's Name</label>
+                <input type="text" id="angelName" placeholder="e.g. Amane, Seraph, Pochi..." maxlength="20">
+            </div>
+
+            <div class="consent-box">
+                <div class="section-title" style="font-size: 16px; margin-bottom: 8px;">
+                    <i data-lucide="shield" color="#10b981"></i>
+                    <span>Privacy & Data</span>
+                </div>
+                <p style="font-size: 13px; margin-bottom: 12px; color: #6b7280;">
+                    私たちは「スパイウェアではない」ことを保証します。
+                    あなたの詳細な閲覧履歴が外部に送信されることはありません。
+                </p>
+
+                <label class="checkbox-label">
+                    <input type="checkbox" id="consentStats">
+                    <div>
+                        <strong>匿名統計データ (Global Stats) に参加する</strong><br>
+                        <span
+                            style="color: #6b7280; font-size: 12px;">世界の「断捨離総量ランキング」に参加します。送信されるのはランダムIDとタブ数のみです。</span>
+                    </div>
+                </label>
+            </div>
+
+            <button class="btn" id="nextBtn" disabled>
+                <span>Start Journey</span>
+                <i data-lucide="arrow-right"></i>
+            </button>
+
+            <div class="link-sub">
+                <a href="https://kai-tas.github.io/tabCleaner/privacy.html" target="_blank">Privacy Policy</a>
+            </div>
+        </div>
+
+        <!-- Step 2: Spreadsheet (Optional) -->
+        <div class="card" id="step2" style="display: none;">
+            <div class="section-title">
+                <i data-lucide="database"></i>
+                <span>History Backup (Optional)</span>
+            </div>
+            <p style="font-size: 14px; margin-bottom: 20px;">
+                Google Spreadsheetと連携すると、閉じたタブの履歴を永続化できます。<br>
+                <span style="font-size: 12px; color: #6b7280;">※後で設定画面からも設定可能です。</span>
+            </p>
+
+            <button class="btn"
+                style="background: white; color: #4b5563; border: 1px solid #d1d5db; margin-bottom: 12px;"
+                id="toggleSetup">
+                <i data-lucide="settings-2"></i>
+                <span>連携セットアップ手順を表示</span>
+            </button>
+
+            <div class="setup-steps" id="setupSteps">
+                <ol style="font-size: 14px; padding-left: 20px; line-height: 1.8;">
+                    <li><a href="https://sheets.new" target="_blank">Google Spreadsheetを新規作成</a></li>
+                    <li><code>拡張機能</code> > <code>Apps Script</code> を開く</li>
+                    <li>
+                        <button id="copyCodeBtn"
+                            style="padding: 2px 8px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                            GASコードをコピー
+                        </button>
+                        して貼り付け
+                    </li>
+                    <li><code>デプロイ</code> > <code>ウェブアプリ</code> (アクセス権: 全員)</li>
+                    <li>発行されたURLを下に貼り付け</li>
+                </ol>
+
+                <div class="input-group" style="margin-top: 16px;">
+                    <label>Web App URL</label>
+                    <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/..."
+                        style="font-size: 14px;">
+                </div>
+            </div>
+
+            <button class="btn" id="finishBtn">
+                <i data-lucide="check"></i>
+                <span>Complete Setup</span>
+            </button>
+
+            <div class="link-sub">
+                <button id="skipBtn">スキップして完了</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast">
+        <i data-lucide="check-circle"></i>
+        <span id="toastMsg">Saved!</span>
+    </div>
+
+    <script src="welcome.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

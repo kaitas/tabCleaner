@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tab Cleanup - Release Notes</title>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+JP:wght@400;500;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">🧹 Tab Cleanup</div>
+            <nav class="nav">
+                <a href="index.html#features" data-i18n="nav.features">Features</a>
+                <a href="howto.html" data-i18n="nav.howto">How To Use</a>
+                <a href="releases.html" data-i18n="nav.releases" class="active">Release Notes</a>
+                <a href="https://github.com/kaitas/tabCleaner" target="_blank" class="github-link"
+                    data-i18n="nav.github">GitHub</a>
+                <button id="langToggle" class="lang-btn">JP</button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container" style="padding: 120px 20px 60px;">
+            <h1 data-i18n="releases.title" style="text-align: center; margin-bottom: 60px;">Release Notes</h1>
+
+            <div style="max-width: 800px; margin: 0 auto;">
+                <div class="feature-card" style="text-align: left; margin-bottom: 24px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h3 style="margin: 0;">v0.3.0</h3>
+                        <span style="font-size: 0.9em; color: var(--text-sub);">2024-01-12</span>
+                    </div>
+                    <ul style="padding-left: 20px; color: var(--text-sub);">
+                        <li>Added FTUE (First Time User Experience) guide.</li>
+                        <li>Implemented Spreadsheet setup integration flow.</li>
+                        <li>Added Multilingual Website (EN/JA).</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card" style="text-align: left; margin-bottom: 24px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h3 style="margin: 0;">v0.2.0</h3>
+                        <span style="font-size: 0.9em; color: var(--text-sub);">2024-01-12</span>
+                    </div>
+                    <ul style="padding-left: 20px; color: var(--text-sub);">
+                        <li>Added Selective Tab Closing feature.</li>
+                        <li>Implemented Tab Review UI.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p data-i18n="footer.copy">&copy; 2024 Tab Cleanup Project. Open Source on GitHub.</p>
+        </div>
+    </footer>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>
