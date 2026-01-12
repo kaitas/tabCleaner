@@ -162,8 +162,8 @@ async function clearHistory() {
   showToast('🗑️ 履歴を削除しました');
 }
 
-// Test Connection
-async function testConnection() {
+// Test & Save Connection
+async function testAndSaveConnection() {
   const url = spreadsheetUrlInput.value.trim();
   if (!url) {
     showToast('❌ URLを入力してください');
@@ -174,7 +174,7 @@ async function testConnection() {
   testConnectionBtn.textContent = '⏳';
   testResult.style.display = 'block';
   testResult.innerHTML = 'Connecting...';
-  testResult.style.color = '#666';
+  // Save button is secondary now, maybe disable it or just let it be
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10000);
@@ -182,7 +182,7 @@ async function testConnection() {
   try {
     const testData = {
       tabs: [
-        { title: "Test Line (Options)", url: "chrome://settings" }
+        { title: "Test & Save (Options)", url: "chrome://settings" }
       ]
     };
 
@@ -197,9 +197,26 @@ async function testConnection() {
 
     if (!response.ok) throw new Error(`Status ${response.status}`);
 
+    // Success! Save settings immediately
+    const settings = await chrome.storage.sync.get(defaultSettings);
+    settings.spreadsheetUrl = url;
+    settings.enableSpreadsheet = true; // Auto-enable on success
+    settings.sheetName = 'tabCleaner'; // Force default
+    await chrome.storage.sync.set(settings);
+
+    // Update UI to reflect saved state
+    enableSpreadsheetInput.checked = true;
+
     testResult.style.color = '#10b981';
-    testResult.innerHTML = '✅ 接続成功！Spreadsheetを確認してください';
-    showToast('✅ テスト送信成功');
+    testResult.innerHTML = '✅ 接続成功！設定を保存しました';
+    showToast('✅ テスト成功 & 保存完了');
+
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'icons/icon128.png',
+      title: 'Tab Cleanup',
+      message: '🎉 GAS連携成功！\n設定を保存し、連携を有効にしました。'
+    });
 
   } catch (e) {
     console.error(e);
@@ -207,9 +224,16 @@ async function testConnection() {
     let msg = e.message;
     if (e.name === 'AbortError') msg = 'Timeout';
     testResult.innerHTML = `❌ エラー: ${msg}`;
+
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'icons/icon128.png',
+      title: 'Tab Cleanup',
+      message: `💔 接続テスト失敗: ${msg}\nURLを確認してください。`
+    });
   } finally {
     testConnectionBtn.disabled = false;
-    testConnectionBtn.textContent = '🧪';
+    testConnectionBtn.textContent = 'Test & Save'; // Label update
   }
 }
 
@@ -239,7 +263,7 @@ toggleGasSetupBtn.addEventListener('click', () => {
 });
 
 copyGasBtn.addEventListener('click', copyGasCode);
-testConnectionBtn.addEventListener('click', testConnection);
+testConnectionBtn.addEventListener('click', testAndSaveConnection);
 
 // 初期化
 document.addEventListener('DOMContentLoaded', () => {

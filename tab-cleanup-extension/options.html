@@ -260,18 +260,14 @@
         <label for="spreadsheetUrl">SpreadsheetのURL</label>
         <div style="display:flex; gap:8px;">
           <input type="url" id="spreadsheetUrl" placeholder="https://script.google.com/macros/s/..." style="flex:1;">
-          <button id="testConnectionBtn" class="btn btn-primary" style="padding:10px; width:auto; font-size:14px;"
-            title="テスト送信">🧪</button>
+          <button id="testConnectionBtn" class="btn btn-primary" style="padding:10px 20px; width:auto; font-size:14px;"
+            title="テストして保存">Test & Save</button>
         </div>
         <p class="help-text">GASウェブアプリのURL (https://script.google.com/macros/s/...) を入力してください</p>
         <p id="testResult" style="font-size:12px; margin-top:4px; display:none;"></p>
       </div>
 
-      <div class="form-group">
-        <label for="sheetName">シート名</label>
-        <input type="text" id="sheetName" value="tabCleaner" placeholder="tabCleaner">
-        <p class="help-text">※デフォルトは "tabCleaner" です</p>
-      </div>
+
 
       <div class="form-group">
         <div class="checkbox-group">
