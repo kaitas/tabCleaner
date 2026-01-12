@@ -60,6 +60,7 @@ const translations = {
         "game.2.desc": "<strong>18:00 - 22:00</strong> はハッピーアワー。獲得Karmaが <strong>2倍</strong> になります。断捨離のゴールデンタイムです！",
         "game.3.title": "世界ランキング",
         "game.3.desc": "あなたの努力はリージョン別（APAC等）に集計され、ランク付けされます。最も美しいブラウザを目指しましょう。",
+        "game.explore": "ゲーム機能を見る",
         "howto.title": "使い方",
         "howto.step1.title": "1. インストールと設定",
         "howto.step1.desc": "Chrome Web Storeからインストールし、ピン留めします。<br>最初の起動で、あなたの「ブラウザの天使」に名前をつけてください。",

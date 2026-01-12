@@ -1,4 +1,5 @@
 // Tab Cleanup - Background Service Worker
+console.log('Tab Cleanup Service Worker Starting...');
 import { processTabClose, isFeverTime, loadGameState } from './gamification.js';
 import { getNotificationContent } from './notifications.js';
 import { checkForUpdates } from './updates.js';
