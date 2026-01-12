@@ -163,10 +163,13 @@ async function recordAndCloseTabs() {
   // 新しいタブを開いてから他を閉じる
   const newTab = await chrome.tabs.create({ url: 'chrome://newtab' });
 
+  let closedCount = 0;
+
   for (const tab of tabs) {
     if (tab.id !== newTab.id) {
       try {
         await chrome.tabs.remove(tab.id);
+        closedCount++;
         // onRemoved listener will pick this up for scoring
       } catch (e) {
         console.log('Could not close tab:', tab.url);
@@ -174,8 +177,14 @@ async function recordAndCloseTabs() {
     }
   }
 
-  const content = getNotificationContent('cleanup', { count: tabs.length });
-  showNotification(content.title, content.message);
+  if (closedCount > 0) {
+    const content = getNotificationContent('cleanup', { count: closedCount });
+    showNotification(content.title, content.message);
+  } else {
+    // 0 tabs closed (Already clean)
+    const content = getNotificationContent('clean');
+    showNotification(content.title, content.message);
+  }
 }
 
 // Spreadsheetに保存（GAS Web App経由）
