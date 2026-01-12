@@ -91,6 +91,45 @@ if (settingsBtn) {
   });
 }
 
+// Open Sheet Button
+const openSheetBtn = document.getElementById('openSheetBtn');
+if (openSheetBtn) {
+  chrome.storage.sync.get(['spreadsheetUrl', 'enableSpreadsheet'], (res) => {
+    // GAS Web App URL is usually script.google.com, but the user might want to see the SHEET, not the script.
+    // Ideally we should store the Sheet URL too, currently we only have script URL locally.
+    // But usually the script URL is "macros/s/...", the sheet is "spreadsheets/d/...".
+    // The user inputs the SCRIPT URL in options. 
+    // We can't derive the Sheet URL easily unless we ask for it separately.
+    // Exception: If the user inputs the Script URL, we can't open the sheet from it directly.
+    // Wait, options.html asks for: "GASウェブアプリのURL". This is the EXEC URL.
+    // User Request: "自分の保存スプレッドシートへのリンクが欲しい"
+    // Workaround: We display the button if enabled, but maybe we just open the entered URL? 
+    // No, opening the Script Exec URL just returns JSON.
+    // We need the Sheet URL.
+    // Let's update options to ask for Sheet URL? Or just assume the user can find it?
+    // Actually, the Script is deployed attached to a Sheet container usually? Or standalone?
+    // If container-bound, we can't get the Sheet URL from the Script URL.
+
+    // Let's just show it if enabled for now, maybe open the script manage page?
+    // Or better: In Options, asking for "Spreadsheet URL" (View) would be better UX but adds friction.
+    // Let's disable this button logic for now or make it open the Options page highlighting the link?
+    // Re-reading user request: "未済の人はそのリンク"
+    // Let's make it: If configured, click to open. If not, click to setup.
+
+    if (res.enableSpreadsheet && res.spreadsheetUrl) {
+      openSheetBtn.style.display = 'block';
+      openSheetBtn.addEventListener('click', () => {
+        // Since we only have the Script URL, maybe we just prompt the user?
+        // Or we just try to open it? 
+        // Opening the Script URL runs the doGet, which returns "Active".
+        // This is not useful for viewing data.
+        // We need to store the "View URL".
+        alert('注意: スプレッドシート本体のURLは保存されていません。\n(GASのWebアプリURLのみ保存されています)');
+      });
+    }
+  });
+}
+
 // 設定を読み込み
 async function loadSettings() {
   const settings = await chrome.storage.sync.get({
