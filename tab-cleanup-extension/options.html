@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,32 +11,38 @@
       margin: 0;
       padding: 0;
     }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: #f5f5f5;
       min-height: 100vh;
       padding: 40px 20px;
     }
+
     .container {
       max-width: 600px;
       margin: 0 auto;
     }
+
     h1 {
       font-size: 28px;
       color: #333;
       margin-bottom: 8px;
     }
+
     .subtitle {
       color: #666;
       margin-bottom: 32px;
     }
+
     .card {
       background: #fff;
       border-radius: 12px;
       padding: 24px;
       margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
+
     .card-title {
       font-size: 16px;
       font-weight: bold;
@@ -45,18 +52,22 @@
       align-items: center;
       gap: 8px;
     }
+
     .form-group {
       margin-bottom: 20px;
     }
+
     .form-group:last-child {
       margin-bottom: 0;
     }
+
     label {
       display: block;
       font-size: 14px;
       color: #555;
       margin-bottom: 8px;
     }
+
     input[type="time"],
     input[type="text"],
     input[type="url"] {
@@ -67,25 +78,30 @@
       font-size: 16px;
       transition: border-color 0.2s;
     }
+
     input:focus {
       outline: none;
       border-color: #667eea;
     }
+
     .checkbox-group {
       display: flex;
       align-items: center;
       gap: 12px;
     }
+
     input[type="checkbox"] {
       width: 20px;
       height: 20px;
       accent-color: #667eea;
     }
+
     .help-text {
       font-size: 12px;
       color: #888;
       margin-top: 6px;
     }
+
     .btn {
       padding: 14px 28px;
       border: none;
@@ -95,23 +111,28 @@
       cursor: pointer;
       transition: transform 0.1s, opacity 0.1s;
     }
+
     .btn:hover {
       transform: scale(1.02);
     }
+
     .btn-primary {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: #fff;
     }
+
     .btn-secondary {
       background: #e0e0e0;
       color: #333;
       margin-left: 12px;
     }
+
     .btn-group {
       display: flex;
       justify-content: flex-end;
       margin-top: 24px;
     }
+
     .toast {
       position: fixed;
       bottom: 24px;
@@ -122,16 +143,26 @@
       border-radius: 8px;
       font-size: 14px;
       display: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
+
     .toast.show {
       display: block;
       animation: slideIn 0.3s ease;
     }
+
     @keyframes slideIn {
-      from { transform: translateX(100px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+      from {
+        transform: translateX(100px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
     }
+
     .history-item {
       display: flex;
       justify-content: space-between;
@@ -141,48 +172,58 @@
       border-radius: 8px;
       margin-bottom: 8px;
     }
+
     .history-date {
       font-weight: bold;
     }
+
     .history-count {
       color: #667eea;
     }
+
     .no-history {
       color: #888;
       text-align: center;
       padding: 20px;
     }
+
     .danger-zone {
       border: 2px solid #fee2e2;
       background: #fef2f2;
     }
+
     .btn-danger {
       background: #ef4444;
       color: #fff;
     }
   </style>
 </head>
+
 <body>
   <div class="container">
-    <h1>⚙️ Tab Cleanup 設定</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+      <h1>⚙️ 設定</h1>
+      <button id="closeOptionsBtn" style="border:none; background:none; cursor:pointer; font-size:16px; color:#666;">❌
+        閉じる</button>
+    </div>
     <p class="subtitle">タイマーとSpreadsheet連携を設定します</p>
 
     <!-- 時刻設定 -->
     <div class="card">
       <h2 class="card-title">⏰ タイマー設定</h2>
-      
+
       <div class="form-group">
         <label for="warnTime">警告時刻</label>
         <input type="time" id="warnTime" value="18:00">
         <p class="help-text">この時刻になると通知を表示し、タブの確認を促します</p>
       </div>
-      
+
       <div class="form-group">
         <label for="closeTime">強制終了時刻</label>
         <input type="time" id="closeTime" value="21:00">
         <p class="help-text">この時刻に全タブを記録して自動的に閉じます</p>
       </div>
-      
+
       <div class="form-group">
         <div class="checkbox-group">
           <input type="checkbox" id="enableTimer" checked>
@@ -194,38 +235,63 @@
     <!-- Spreadsheet連携 -->
     <div class="card">
       <h2 class="card-title">📊 Google Spreadsheet連携</h2>
-      
+
+      <!-- GAS Setup Accordion -->
+      <div style="margin-bottom: 20px; border: 1px solid #eee; border-radius: 8px; overflow: hidden;">
+        <button id="toggleGasSetup"
+          style="width:100%; padding:10px; background:#f9f9f9; border:none; text-align:left; cursor:pointer; font-weight:bold; display:flex; justify-content:space-between;">
+          <span>🛠️ GASセットアップ手順 (コードを表示)</span>
+          <span id="gasArrow">▼</span>
+        </button>
+        <div id="gasSetupContent" style="display:none; padding:15px; background:#fff;">
+          <ol style="font-size: 13px; padding-left: 20px; margin-bottom: 12px; color:#555;">
+            <li><a href="https://sheets.new" target="_blank">Google Spreadsheetを新規作成</a></li>
+            <li><code>拡張機能</code> > <code>Apps Script</code> を開く</li>
+            <li>以下のコードをコピーして貼り付け</li>
+            <li><code>デプロイ</code> > <code>ウェブアプリ</code> (アクセス権: <strong>全員</strong>)</li>
+            <li>発行されたURLを下に貼り付け</li>
+          </ol>
+          <button class="btn btn-secondary" id="copyGasBtn" style="width:100%; margin:0; font-size:13px;">📋
+            コードをコピー</button>
+        </div>
+      </div>
+
       <div class="form-group">
         <label for="spreadsheetUrl">SpreadsheetのURL</label>
-        <input type="url" id="spreadsheetUrl" placeholder="https://docs.google.com/spreadsheets/d/xxxxx/edit">
-        <p class="help-text">記録を保存するSpreadsheetのURLを入力してください</p>
+        <div style="display:flex; gap:8px;">
+          <input type="url" id="spreadsheetUrl" placeholder="https://script.google.com/macros/s/..." style="flex:1;">
+          <button id="testConnectionBtn" class="btn btn-primary" style="padding:10px; width:auto; font-size:14px;"
+            title="テスト送信">🧪</button>
+        </div>
+        <p class="help-text">GASウェブアプリのURL (https://script.google.com/macros/s/...) を入力してください</p>
+        <p id="testResult" style="font-size:12px; margin-top:4px; display:none;"></p>
       </div>
-      
+
       <div class="form-group">
         <label for="sheetName">シート名</label>
-        <input type="text" id="sheetName" value="タブ記録" placeholder="タブ記録">
+        <input type="text" id="sheetName" value="tabCleaner" placeholder="tabCleaner">
+        <p class="help-text">※デフォルトは "tabCleaner" です</p>
       </div>
-      
+
       <div class="form-group">
         <div class="checkbox-group">
           <input type="checkbox" id="enableSpreadsheet">
           <label for="enableSpreadsheet" style="margin-bottom: 0;">Spreadsheet連携を有効にする</label>
         </div>
-        <p class="help-text">※ Google Apps Script (GAS) のデプロイが必要です</p>
       </div>
     </div>
 
     <!-- 通知設定 -->
     <div class="card">
       <h2 class="card-title">🔔 通知設定</h2>
-      
+
       <div class="form-group">
         <div class="checkbox-group">
           <input type="checkbox" id="enableNotification" checked>
           <label for="enableNotification" style="margin-bottom: 0;">デスクトップ通知を表示する</label>
         </div>
       </div>
-      
+
       <div class="form-group">
         <div class="checkbox-group">
           <input type="checkbox" id="enableSound">
@@ -255,10 +321,23 @@
       <button class="btn btn-primary" id="saveBtn">💾 設定を保存</button>
       <button class="btn btn-secondary" id="resetBtn">リセット</button>
     </div>
+
+    <!-- Helpful Links -->
+    <div style="margin-top: 40px; text-align: center; font-size: 13px; color: #888;">
+      <a href="https://kai-tas.github.io/tabCleaner/" target="_blank"
+        style="color:#667eea; text-decoration:none; margin:0 10px;">Website (Help)</a>
+      |
+      <a href="https://kai-tas.github.io/tabCleaner/privacy.html" target="_blank"
+        style="color:#667eea; text-decoration:none; margin:0 10px;">Privacy Policy</a>
+      |
+      <a href="https://kai-tas.github.io/tabCleaner/releases.html" target="_blank"
+        style="color:#667eea; text-decoration:none; margin:0 10px;">v0.4.0 Info</a>
+    </div>
   </div>
 
   <div class="toast" id="toast"></div>
 
   <script src="options.js"></script>
 </body>
+
 </html>

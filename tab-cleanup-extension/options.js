@@ -8,10 +8,61 @@ const enableSpreadsheetInput = document.getElementById('enableSpreadsheet');
 const enableNotificationInput = document.getElementById('enableNotification');
 const enableSoundInput = document.getElementById('enableSound');
 const historyList = document.getElementById('historyList');
+
 const saveBtn = document.getElementById('saveBtn');
 const resetBtn = document.getElementById('resetBtn');
 const clearHistoryBtn = document.getElementById('clearHistory');
+const closeOptionsBtn = document.getElementById('closeOptionsBtn');
+
+// New Elements
+const toggleGasSetupBtn = document.getElementById('toggleGasSetup');
+const gasSetupContent = document.getElementById('gasSetupContent');
+const gasArrow = document.getElementById('gasArrow');
+const copyGasBtn = document.getElementById('copyGasBtn');
+const testConnectionBtn = document.getElementById('testConnectionBtn');
+const testResult = document.getElementById('testResult');
+
 const toastEl = document.getElementById('toast');
+
+// GAS Code (Same as welcome.js)
+const GAS_CODE = `/**
+ * Tab Cleanup - Google Apps Script
+ * Spreadsheet連携用のWeb App
+ */
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = ss.getSheetByName('tabCleaner'); 
+    
+    if (!sheet) {
+      sheet = ss.insertSheet('tabCleaner');
+      sheet.appendRow(['Date', 'Time', 'Tab Count', 'Titles', 'URLs']);
+      sheet.setFrozenRows(1);
+    }
+    
+    // data.tabs is an array of {title, url}
+    const timestamp = new Date();
+    const dateStr = Utilities.formatDate(timestamp, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    const timeStr = Utilities.formatDate(timestamp, Session.getScriptTimeZone(), 'HH:mm:ss');
+    
+    const titles = data.tabs.map(t => t.title).join('\\n');
+    const urls = data.tabs.map(t => t.url).join('\\n');
+    
+    sheet.appendRow([dateStr, timeStr, data.tabs.length, titles, urls]);
+    
+    return ContentService.createTextOutput(JSON.stringify({status: 'success'}))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({status: 'error', message: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  return ContentService.createTextOutput('Active');
+}`;
 
 // デフォルト設定
 const defaultSettings = {
@@ -19,7 +70,7 @@ const defaultSettings = {
   closeTime: '21:00',
   enableTimer: true,
   spreadsheetUrl: '',
-  sheetName: 'タブ記録',
+  sheetName: 'tabCleaner',
   enableSpreadsheet: false,
   enableNotification: true,
   enableSound: false
@@ -35,12 +86,12 @@ function showToast(message, duration = 3000) {
 // 設定を読み込み
 async function loadSettings() {
   const settings = await chrome.storage.sync.get(defaultSettings);
-  
+
   warnTimeInput.value = settings.warnTime;
   closeTimeInput.value = settings.closeTime;
   enableTimerInput.checked = settings.enableTimer;
   spreadsheetUrlInput.value = settings.spreadsheetUrl;
-  sheetNameInput.value = settings.sheetName;
+  sheetNameInput.value = settings.sheetName || 'tabCleaner';
   enableSpreadsheetInput.checked = settings.enableSpreadsheet;
   enableNotificationInput.checked = settings.enableNotification;
   enableSoundInput.checked = settings.enableSound;
@@ -52,25 +103,25 @@ async function saveSettings() {
     warnTime: warnTimeInput.value,
     closeTime: closeTimeInput.value,
     enableTimer: enableTimerInput.checked,
-    spreadsheetUrl: spreadsheetUrlInput.value,
-    sheetName: sheetNameInput.value,
+    spreadsheetUrl: spreadsheetUrlInput.value.trim(),
+    sheetName: sheetNameInput.value.trim(),
     enableSpreadsheet: enableSpreadsheetInput.checked,
     enableNotification: enableNotificationInput.checked,
     enableSound: enableSoundInput.checked
   };
-  
+
   await chrome.storage.sync.set(settings);
-  
+
   // background.jsにアラームを再設定するよう通知
   chrome.runtime.sendMessage({ action: 'updateAlarms', settings });
-  
+
   showToast('✅ 設定を保存しました！');
 }
 
 // 設定をリセット
 async function resetSettings() {
   if (!confirm('設定をデフォルトに戻しますか？')) return;
-  
+
   await chrome.storage.sync.set(defaultSettings);
   await loadSettings();
   showToast('🔄 設定をリセットしました');
@@ -79,20 +130,20 @@ async function resetSettings() {
 // 履歴を読み込み
 async function loadHistory() {
   const { tabHistory = [] } = await chrome.storage.local.get('tabHistory');
-  
+
   if (tabHistory.length === 0) {
     historyList.innerHTML = '<p class="no-history">まだ記録がありません</p>';
     return;
   }
-  
+
   // 最新10件を表示
   const recentHistory = tabHistory.slice(-10).reverse();
-  
+
   historyList.innerHTML = recentHistory.map(record => {
     const date = new Date(record.date);
     const dateStr = date.toLocaleDateString('ja-JP');
     const timeStr = date.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-    
+
     return `
       <div class="history-item">
         <span class="history-date">${dateStr} ${timeStr}</span>
@@ -105,16 +156,90 @@ async function loadHistory() {
 // 履歴を削除
 async function clearHistory() {
   if (!confirm('すべての履歴を削除しますか？\nこの操作は取り消せません。')) return;
-  
+
   await chrome.storage.local.set({ tabHistory: [] });
   await loadHistory();
   showToast('🗑️ 履歴を削除しました');
+}
+
+// Test Connection
+async function testConnection() {
+  const url = spreadsheetUrlInput.value.trim();
+  if (!url) {
+    showToast('❌ URLを入力してください');
+    return;
+  }
+
+  testConnectionBtn.disabled = true;
+  testConnectionBtn.textContent = '⏳';
+  testResult.style.display = 'block';
+  testResult.innerHTML = 'Connecting...';
+  testResult.style.color = '#666';
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const testData = {
+      tabs: [
+        { title: "Test Line (Options)", url: "chrome://settings" }
+      ]
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(testData),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) throw new Error(`Status ${response.status}`);
+
+    testResult.style.color = '#10b981';
+    testResult.innerHTML = '✅ 接続成功！Spreadsheetを確認してください';
+    showToast('✅ テスト送信成功');
+
+  } catch (e) {
+    console.error(e);
+    testResult.style.color = '#ef4444';
+    let msg = e.message;
+    if (e.name === 'AbortError') msg = 'Timeout';
+    testResult.innerHTML = `❌ エラー: ${msg}`;
+  } finally {
+    testConnectionBtn.disabled = false;
+    testConnectionBtn.textContent = '🧪';
+  }
+}
+
+// Copy Code
+async function copyGasCode() {
+  try {
+    await navigator.clipboard.writeText(GAS_CODE);
+    showToast('📋 GASコードをコピーしました');
+  } catch (e) {
+    showToast('❌ コピー失敗');
+  }
 }
 
 // イベントリスナー
 saveBtn.addEventListener('click', saveSettings);
 resetBtn.addEventListener('click', resetSettings);
 clearHistoryBtn.addEventListener('click', clearHistory);
+closeOptionsBtn.addEventListener('click', () => {
+  // Try to close tab, if popup it closes, if tab it might block but usually works for extension pages
+  window.close();
+});
+
+toggleGasSetupBtn.addEventListener('click', () => {
+  const isHidden = gasSetupContent.style.display === 'none';
+  gasSetupContent.style.display = isHidden ? 'block' : 'none';
+  gasArrow.textContent = isHidden ? '▲' : '▼';
+});
+
+copyGasBtn.addEventListener('click', copyGasCode);
+testConnectionBtn.addEventListener('click', testConnection);
 
 // 初期化
 document.addEventListener('DOMContentLoaded', () => {
